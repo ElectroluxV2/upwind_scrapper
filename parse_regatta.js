@@ -1,25 +1,8 @@
-import { get, OPEN_SKIFF_NAME_PATTERN } from './utils.js';
-import { parse_table } from './parse_table.js';
+import { get, OPEN_SKIFF_NAME_PATTERN, same_length_array_zip } from './utils.js';
+import { filter_table, parse_table } from './parse_table.js';
 
 export const parse_regatta = async url => {
     const { regatta } = await get(`${url}.json`);
-
-    const entries_tab = await get(`${url}/entries.json`);
-    let pending_entries = entries_tab['tables']
-        .filter(item => OPEN_SKIFF_NAME_PATTERN.test(item.name))
-        .map(item => item['table']);
-
-    // console.log(pending_entries)
-    if (!pending_entries) {
-        console.log(url)
-        return null;
-    }
-
-    pending_entries = pending_entries
-        .map(parse_table);
-
-    const entries = await Promise.all(pending_entries);
-    // console.log(entries)
 
     const results_tab = await get(`${url}/results.json`);
     const pending_unparsed_results = results_tab['tables']
@@ -33,16 +16,36 @@ export const parse_regatta = async url => {
         .flat()
         .filter(item => OPEN_SKIFF_NAME_PATTERN.test(item.name))
         .map(item => item['table'])
+        .filter(table => 'head' in table && 'body' in table)
         .map(parse_table);
 
-    const results = (await Promise.all(pending_results)).flat();
-    // console.log(results);
+    const results_array = await Promise.all(pending_results);
+
+    const entries = results_array
+        .map(table => filter_table(table, ['sail_number', 'crew', 'dob', 'gender', 'sailing_club']))
+        .map(({keys, values}) => ({
+            keys: keys.map(({id}) => id),
+            values
+        }))
+        .map(({keys, values}) => {
+            return values.map(row =>  Object.fromEntries(same_length_array_zip(keys, row)))
+        })
+        .flat();
+
+    const filtered_results = results_array
+        .map(table => filter_table(table, ['sail_number', 'race']))
+        .map(({keys, values}) => ({
+            keys: keys.map(), // TODO: Combine id with label when necessary
+            values
+        }));
+
+    console.log(filtered_results)
 
     return {
         id: regatta['id'],
         name: regatta['name'],
         entries,
-        results
+        results: filtered_results
     }
-
 }
+
