@@ -27,25 +27,32 @@ export const parse_regatta = async url => {
             keys: keys.map(({id}) => id),
             values
         }))
-        .map(({keys, values}) => {
-            return values.map(row =>  Object.fromEntries(same_length_array_zip(keys, row)))
-        })
+        .map(({keys, values}) => values
+            .map(row => Object.fromEntries(same_length_array_zip(keys, row))))
         .flat();
 
     const filtered_results = results_array
         .map(table => filter_table(table, ['sail_number', 'race']))
         .map(({keys, values}) => ({
-            keys: keys.map(), // TODO: Combine id with label when necessary
+            keys: keys.map(combine_key),
             values
-        }));
-
-    console.log(filtered_results)
+        }))
+        .map(({keys, values}) => values
+            .map(row => Object.fromEntries(same_length_array_zip(keys, row)))
+        ).flat();
 
     return {
         id: regatta['id'],
         name: regatta['name'],
         entries,
         results: filtered_results
+    }
+}
+
+const combine_key = ({label, id}) => {
+    switch (id) {
+        case 'race': return label.toLowerCase();
+        default: return id;
     }
 }
 

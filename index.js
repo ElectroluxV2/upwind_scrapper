@@ -16,27 +16,27 @@ const pending_pages = Array
     .map(get);
 
 const pages = await Promise.all(pending_pages);
-// const pending_scrapped = pages.map(page => page['results']['items'])
-//     .flat()
-//     .map(item => item['url'])
-//     .map(parse_regatta);
-//
-// const scrapped = await Promise.all(pending_scrapped);
-//
-// console.log(scrapped.join());
+const pending_scrapped = pages.map(page => page['results']['items'])
+    .flat()
+    .map(item => item['url'])
+    .map(parse_regatta);
 
-// const urls = pages.map(page => page['results']['items'])
-//     .flat()
-//     .map(item => item['url']);
-//
-// for (const url of urls) {
-//     console.log(`URL: ${url}`);
-//     const scrapped = await parse_regatta(url);
-//     console.log('scrapped: ', scrapped);
-// }
+const scrapped = await Promise.all(pending_scrapped);
+
+console.log(scrapped.join());
+
+const urls = pages.map(page => page['results']['items'])
+    .flat()
+    .map(item => item['url']);
+
+for (const url of urls) {
+    console.log(`URL: ${url}`);
+    const scrapped = await parse_regatta(url);
+    console.log('scrapped: ', scrapped);
+}
 
 // console.log(await get('https://www.upwind24.pl/regatta/mistrzostwa-pomorza-w-klasie-open-skiff-2021-2021/results.json'))
-
-parse_regatta('/regatta/mistrzostwa-pomorza-w-klasie-open-skiff-2021-2021').then(scrapped => console.log('scrapped: '));
-
+//
+// parse_regatta('/regatta/mistrzostwa-pomorza-w-klasie-open-skiff-2021-2021').then(scrapped => console.log('scrapped: ', scrapped));
+//
 
