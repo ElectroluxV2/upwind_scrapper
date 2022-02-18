@@ -48,7 +48,7 @@ export const parse_regatta = async url => {
         end_date: regatta['endDate'],
         place: {
             name: regatta['venue']['name'],
-            location: `(${regatta['venue']['latitude']}, ${regatta['venue']['longitude']})`
+            location: `(${regatta['venue']['latitude'].toFixed(6)}, ${regatta['venue']['longitude'].toFixed(6)})`
         },
         entries,
         results: filtered_results
