@@ -44,6 +44,12 @@ export const parse_regatta = async url => {
     return {
         id: regatta['id'],
         name: regatta['name'],
+        begin_date: regatta['startDate'],
+        end_date: regatta['endDate'],
+        place: {
+            name: regatta['venue']['name'],
+            location: `(${regatta['venue']['latitude']}, ${regatta['venue']['longitude']})`
+        },
         entries,
         results: filtered_results
     }
