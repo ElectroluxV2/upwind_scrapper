@@ -10,3 +10,4 @@ export const same_length_array_zip = (a, b) => a.map((k, i) => [k, b[i]]);
 export const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
 export const string_similarity = (first, second) => stringSimilarity.compareTwoStrings(first, second);
 export const to_pg_date = timestamp => { const d = new Date(timestamp); return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}` };
+export const polish_date_to_date = date_string => { const p = date_string.split('.'); return new Date(p[2], p[1] - 1, p[0]); };
